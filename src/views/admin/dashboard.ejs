@@ -1,0 +1,478 @@
+<div class="main-container">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+            </div>
+            <a href="/admin/logout" class="btn btn-danger">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout
+            </a>
+        </div>
+
+        <!-- Status Cards -->
+        <div class="dashboard-stats mb-4">
+            <div class="stat-card clickable" onclick="filterByStatus('pending')" role="button">
+                <div class="stat-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div>
+                    <h3 class="mb-1"><%= statusCounts.pending %></h3>
+                    <span class="text-muted">Pending Tickets</span>
+                </div>
+            </div>
+            <div class="stat-card clickable" onclick="filterByStatus('in-progress')" role="button">
+                <div class="stat-icon text-info">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <h3 class="mb-1"><%= statusCounts['in-progress'] %></h3>
+                    <span class="text-muted">In Progress</span>
+                </div>
+            </div>
+            <div class="stat-card clickable" onclick="filterByStatus('completed')" role="button">
+                <div class="stat-icon text-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div>
+                    <h3 class="mb-1"><%= statusCounts.completed %></h3>
+                    <span class="text-muted">Completed</span>
+                </div>
+            </div>
+            <div class="stat-card clickable" onclick="filterByStatus('cancelled')" role="button">
+                <div class="stat-icon text-danger">
+                    <i class="fas fa-times-circle"></i>
+                </div>
+                <div>
+                    <h3 class="mb-1"><%= statusCounts.cancelled %></h3>
+                    <span class="text-muted">Cancelled</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tickets Table Card -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <h3 class="mb-0"><i class="fas fa-ticket-alt me-2"></i>Repair Tickets</h3>
+                    <div class="btn-group" role="group">
+                        <a href="/admin/preview-all" class="btn btn-info btn-sm" target="_blank">
+                            <i class="fas fa-eye me-1"></i>Preview All
+                        </a>
+                    <a href="/admin/print-all" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-pdf me-1"></i>Print All
+                    </a>
+                    </div>
+                </div>
+                <!-- Replace the filter and search section -->
+                <div class="d-flex gap-2">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-filter"></i>
+                        </span>
+                        <select class="form-select" id="statusFilter" name="status">
+                            <option value="all">All Status</option>
+                            <option value="pending" <%= currentStatus === 'pending' ? 'selected' : '' %>>Pending</option>
+                            <option value="in-progress" <%= currentStatus === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+                            <option value="completed" <%= currentStatus === 'completed' ? 'selected' : '' %>>Completed</option>
+                            <option value="cancelled" <%= currentStatus === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                        </select>
+                    </div>
+                    <form id="searchForm" action="/admin/dashboard" method="GET" class="d-flex gap-2">
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" class="form-control" id="ticketSearch" name="search"
+                                   placeholder="Search tickets..."
+                                   value="<%= currentSearch %>">
+                            <input type="hidden" name="status" id="hiddenStatus" value="<%= currentStatus %>">
+                            <input type="hidden" name="page" value="1">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <i class="fas fa-hashtag me-1"></i>Ticket ID
+                                </th>
+                                <th>
+                                    <i class="fas fa-user me-1"></i>Customer
+                                </th>
+                                <th>
+                                    <i class="fas fa-laptop me-1"></i>Device
+                                </th>
+                                <th>
+                                    <i class="fas fa-info-circle me-1"></i>Status
+                                </th>
+                                <th>
+                                    <i class="fas fa-calendar me-1"></i>Submitted
+                                </th>
+                                <th>
+                                    <i class="fas fa-cog me-1"></i>Actions
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketTableBody">
+                            <% if (tickets.length === 0) { %>
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-2x mb-2 text-muted"></i>
+                                        <p class="mb-0">No repair tickets found</p>
+                                    </td>
+                                </tr>
+                            <% } else { %>
+                                <% tickets.forEach(ticket => { %>
+                                    <tr class="ticket-row" data-status="<%= ticket.status %>">
+                                        <td><%= ticket.ticketId %></td>
+                                        <td>
+                                            <div>
+                                                <%= ticket.customerName %>
+                                                <small class="text-muted d-block">
+                                                    <i class="fas fa-id-badge me-1"></i><%= ticket.designation %>
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <i class="fas <%= 
+                                                ticket.deviceType === 'laptop' ? 'fa-laptop' :
+                                                ticket.deviceType === 'desktop' ? 'fa-desktop' :
+                                                ticket.deviceType === 'phone' ? 'fa-mobile-alt' :
+                                                ticket.deviceType === 'tablet' ? 'fa-tablet-alt' :
+                                                'fa-microchip'
+                                            %> me-2"></i>
+                                            <%= ticket.deviceType.charAt(0).toUpperCase() + ticket.deviceType.slice(1) %>
+                                        </td>
+                                        <td>
+                                            <span class="badge <%= 
+                                                ticket.status === 'pending' ? 'bg-warning' :
+                                                ticket.status === 'in-progress' ? 'bg-info' :
+                                                ticket.status === 'completed' ? 'bg-success' :
+                                                'bg-danger'
+                                            %>">
+                                                <i class="fas <%= 
+                                                    ticket.status === 'pending' ? 'fa-clock' :
+                                                    ticket.status === 'in-progress' ? 'fa-tools' :
+                                                    ticket.status === 'completed' ? 'fa-check-circle' :
+                                                    'fa-times-circle'
+                                                %> me-1"></i>
+                                                <%= ticket.status.toUpperCase() %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <%= new Date(ticket.createdAt).toLocaleDateString() %>
+                                                <small class="text-muted d-block">
+                                                    <%= new Date(ticket.createdAt).toLocaleTimeString() %>
+                                                </small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-2">
+                                                <form action="/admin/ticket/<%= ticket._id %>/update" method="POST" class="d-inline">
+                                                    <input type="hidden" name="page" value="<%= currentPage %>">
+                                                    <input type="hidden" name="search" value="<%= currentSearch %>">
+                                                    <input type="hidden" name="status" value="<%= currentStatus %>">
+                                                    <select name="newStatus" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                        <option value="pending" <%= ticket.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                                        <option value="in-progress" <%= ticket.status === 'in-progress' ? 'selected' : '' %>>In Progress</option>
+                                                        <option value="completed" <%= ticket.status === 'completed' ? 'selected' : '' %>>Completed</option>
+                                                        <option value="cancelled" <%= ticket.status === 'cancelled' ? 'selected' : '' %>>Cancelled</option>
+                                                    </select>
+                                                </form>
+                                                <div class="btn-group" role="group">
+                                                    <a href="/admin/preview/<%= ticket._id %>" class="btn btn-sm btn-info" target="_blank">
+                                                        <i class="fas fa-eye me-1"></i>Preview
+                                                    </a>
+                                                <a href="/admin/print/<%= ticket._id %>" class="btn btn-sm btn-success" target="_blank">
+                                                    <i class="fas fa-file-pdf me-1"></i>Print
+                                                </a>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-info" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#ticketModal<%= ticket._id %>">
+                                                    <i class="fas fa-eye me-1"></i>Details
+                                                </button>
+                                                <!-- Replace the delete button and its modal -->
+                                                <form action="/admin/ticket/<%= ticket._id %>/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete ticket <%= ticket.ticketId %>? This action cannot be undone.');">
+                                                    <button type="submit" class="btn btn-sm btn-danger">
+                                                        <i class="fas fa-trash me-1"></i>Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                            <small class="text-muted d-block mt-1">
+                                                <i class="fas fa-clock me-1"></i>Auto-delete on: 
+                                                <%= new Date(ticket.autoDeleteDate).toLocaleDateString() %>
+                                            </small>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Ticket Details Modal -->
+                                    <div class="modal fade" id="ticketModal<%= ticket._id %>" tabindex="-1" style="z-index: 1050;">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">
+                                                        <i class="fas fa-ticket-alt me-2"></i>
+                                                        Ticket Details - <%= ticket.ticketId %>
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="customer-info mb-4">
+                                                        <h6 class="text-muted mb-3">Customer Information</h6>
+                                                        <p class="mb-2">
+                                                            <i class="fas fa-user me-2"></i>
+                                                            <strong>Name:</strong> <%= ticket.customerName %>
+                                                        </p>
+                                                        <p class="mb-2">
+                                                            <i class="fas fa-id-badge me-2"></i>
+                                                            <strong>Designation:</strong> <%= ticket.designation %>
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            <i class="fas fa-phone me-2"></i>
+                                                            <strong>Phone:</strong> <%= ticket.phone %>
+                                                        </p>
+                                                    </div>
+                                                    <div class="device-info mb-4">
+                                                        <h6 class="text-muted mb-3">Device Information</h6>
+                                                        <p class="mb-0">
+                                                            <i class="fas <%= 
+                                                                ticket.deviceType === 'laptop' ? 'fa-laptop' :
+                                                                ticket.deviceType === 'desktop' ? 'fa-desktop' :
+                                                                ticket.deviceType === 'phone' ? 'fa-mobile-alt' :
+                                                                ticket.deviceType === 'tablet' ? 'fa-tablet-alt' :
+                                                                'fa-microchip'
+                                                            %> me-2"></i>
+                                                            <strong>Type:</strong> <%= ticket.deviceType.charAt(0).toUpperCase() + ticket.deviceType.slice(1) %>
+                                                        </p>
+                                                    </div>
+                                                    <div class="problem-info">
+                                                        <h6 class="text-muted mb-3">Problem Description</h6>
+                                                        <p class="border p-3 bg-light rounded mb-0">
+                                                            <%= ticket.problemDescription %>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                        <i class="fas fa-times me-2"></i>Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Pagination controls -->
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="pagination-info">
+                        Showing <span id="startRecord"><%= ((currentPage - 1) * 10) + 1 %></span> to 
+                        <span id="endRecord"><%= Math.min(currentPage * 10, totalTickets) %></span> of 
+                        <span id="totalRecords"><%= totalTickets %></span> entries
+                    </div>
+                    <div class="pagination-controls">
+                        <a href="/admin/dashboard?page=<%= currentPage - 1 %>" 
+                           class="btn btn-sm btn-secondary me-2 <%= currentPage <= 1 ? 'disabled' : '' %>"
+                           <%= currentPage <= 1 ? 'aria-disabled="true" tabindex="-1"' : '' %>>
+                            <i class="fas fa-chevron-left me-1"></i>Previous
+                        </a>
+                        <span id="pageInfo" class="mx-2">
+                            Page <span id="currentPageNum"><%= currentPage %></span> of 
+                            <span id="totalPages"><%= totalPages %></span>
+                        </span>
+                        <a href="/admin/dashboard?page=<%= currentPage + 1 %>" 
+                           class="btn btn-sm btn-secondary <%= currentPage >= totalPages ? 'disabled' : '' %>"
+                           <%= currentPage >= totalPages ? 'aria-disabled="true" tabindex="-1"' : '' %>>
+                            <i class="fas fa-chevron-right me-1"></i>Next
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Auto Delete Confirmation Modal -->
+<div class="modal fade" id="autoDeleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirm Auto-Delete
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-trash fa-3x text-danger mb-3"></i>
+                    <h4>Auto-Delete Warning</h4>
+                    <p>The following tickets are scheduled for automatic deletion:</p>
+                    <div id="autoDeleteList" class="alert alert-warning">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    These tickets have reached their retention period of 60 days.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmAutoDelete">
+                    <i class="fas fa-trash me-2"></i>Confirm Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.clickable {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.clickable:hover {
+    transform: translateY(-5px);
+}
+.stat-card.active {
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('statusFilter');
+    const searchForm = document.getElementById('searchForm');
+    const hiddenStatus = document.getElementById('hiddenStatus');
+    const searchInput = document.getElementById('ticketSearch');
+
+    // Update hidden status field when status filter changes
+    statusFilter.addEventListener('change', function() {
+        hiddenStatus.value = this.value;
+        searchForm.submit();
+    });
+
+    // Function to filter by clicking status cards
+    window.filterByStatus = function(status) {
+        statusFilter.value = status;
+        hiddenStatus.value = status;
+        searchForm.submit();
+    };
+
+    // Handle form submission
+    searchForm.addEventListener('submit', function(e) {
+        if (!searchInput.value.trim() && hiddenStatus.value === 'all') {
+            e.preventDefault();
+            window.location.href = '/admin/dashboard';
+            return;
+        }
+    });
+
+    // Set active status card
+    const currentStatus = '<%= currentStatus %>';
+    if (currentStatus !== 'all') {
+        const statusCards = document.querySelectorAll('.stat-card');
+        statusCards.forEach(card => {
+            if (card.getAttribute('onclick').includes(currentStatus)) {
+                card.classList.add('active');
+            }
+        });
+    }
+
+    // Update pagination links to preserve filters
+    const paginationLinks = document.querySelectorAll('.pagination-controls a');
+    paginationLinks.forEach(link => {
+        if (!link.classList.contains('disabled')) {
+            const url = new URL(link.href);
+            if (currentStatus !== 'all') {
+                url.searchParams.set('status', currentStatus);
+            }
+            if (searchInput.value.trim()) {
+                url.searchParams.set('search', searchInput.value.trim());
+            }
+            link.href = url.toString();
+        }
+    });
+
+    // Handle delete button loading states
+    const deleteForms = document.querySelectorAll('form[action*="/delete"]');
+    deleteForms.forEach(form => {
+        form.addEventListener('submit', function() {
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Deleting...';
+        });
+    });
+
+    // Auto-delete modal logic
+    const autoDeleteList = document.getElementById('autoDeleteList');
+    const ticketsToDelete = JSON.parse('<%- JSON.stringify(typeof ticketsToDelete !== "undefined" ? ticketsToDelete : []) %>');
+    
+    if (ticketsToDelete && ticketsToDelete.length > 0) {
+        autoDeleteList.innerHTML = ticketsToDelete.map(ticket => 
+            `<div class="mb-2">
+                <strong>${ticket.ticketId}</strong> - Scheduled: ${new Date(ticket.autoDeleteDate).toLocaleDateString()}
+             </div>`
+        ).join('');
+        
+        const autoDeleteModal = new bootstrap.Modal(document.getElementById('autoDeleteConfirmModal'));
+        autoDeleteModal.show();
+    }
+
+    // Delete confirmation button logic
+    const deleteConfirmBtns = document.querySelectorAll('.delete-confirm-btn');
+    deleteConfirmBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const ticketId = this.getAttribute('data-ticket-id');
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/ticket/${ticketId}/delete`;
+            form.style.display = 'none';
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+
+    // Fix: Remove leftover modal backdrops when any modal is hidden
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('hidden.bs.modal', function () {
+            document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                backdrop.parentNode.removeChild(backdrop);
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style = '';
+        });
+    });
+
+    // Fix: When opening a modal, close any other open modals and remove backdrops
+    document.querySelectorAll('.modal').forEach(function(modal) {
+        modal.addEventListener('show.bs.modal', function () {
+            document.querySelectorAll('.modal.show').forEach(function(openModal) {
+                if (openModal !== modal) {
+                    bootstrap.Modal.getInstance(openModal)?.hide();
+                }
+            });
+            document.querySelectorAll('.modal-backdrop').forEach(function(backdrop) {
+                backdrop.parentNode.removeChild(backdrop);
+            });
+            document.body.classList.remove('modal-open');
+            document.body.style = '';
+        });
+    });
+});
+</script>

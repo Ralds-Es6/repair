@@ -1,0 +1,199 @@
+<div class="main-container">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                <i class="fas fa-wrench fa-2x mb-2 text-primary"></i>
+                <h2>Submit Repair Request</h2>
+            </div>
+            <div class="card-body">
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <%= error %>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                <% } %>
+                
+                <form action="/submit-repair" method="POST" class="needs-validation form-grid" novalidate>
+                    <div class="mb-3">
+                        <label for="customerName" class="form-label">
+                            <i class="fas fa-user me-2"></i>Full Name
+                        </label>
+                        <input type="text" class="form-control" id="customerName" name="customerName" 
+                               value="<%= typeof formData !== 'undefined' ? formData.customerName : '' %>" 
+                               required minlength="2" style="text-transform: uppercase;">
+                        <div class="invalid-feedback">
+                            <i class="fas fa-info-circle me-1"></i>Please enter your full name
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="designation" class="form-label">
+                            <i class="fas fa-id-badge me-2"></i>Designation
+                        </label>
+                        <input type="text" class="form-control" id="designation" name="designation"
+                               value="<%= typeof formData !== 'undefined' ? formData.designation : '' %>" 
+                               required style="text-transform: uppercase;">
+                        <div class="invalid-feedback">
+                            <i class="fas fa-info-circle me-1"></i>Please enter your designation
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">
+                            <i class="fas fa-phone me-2"></i>Phone Number
+                        </label>
+                        <input type="tel" class="form-control" id="phone" name="phone"
+                               value="<%= typeof formData !== 'undefined' ? formData.phone : '' %>" 
+                               required>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-info-circle me-1"></i>Please enter your phone number
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="deviceType" class="form-label">
+                            <i class="fas fa-laptop me-2"></i>Device Type
+                        </label>
+                        <select class="form-select" id="deviceType" name="deviceType" required>
+                            <option value="">Select Device Type</option>
+                            <% 
+                            const devices = [
+                                { value: 'laptop', icon: 'laptop', label: 'Laptop' },
+                                { value: 'desktop', icon: 'desktop', label: 'Desktop' },
+                                // { value: 'phone', icon: 'mobile-alt', label: 'Phone' }, Client want to remove this choices
+                                { value: 'tablet', icon: 'tablet-alt', label: 'Tablet' },
+                                { value: 'other', icon: 'microchip', label: 'Other' }
+                            ];
+                            const selectedType = typeof formData !== 'undefined' ? formData.deviceType : '';
+                            devices.forEach(device => { %>
+                                <option value="<%= device.value %>" <%= selectedType === device.value ? 'selected' : '' %>>
+                                    <%= device.label %>
+                                </option>
+                            <% }); %>
+                        </select>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-info-circle me-1"></i>Please select a device type
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="problemDescription" class="form-label">
+                            <i class="fas fa-comment-dots me-2"></i>Problem Description
+                        </label>
+                        <textarea class="form-control" id="problemDescription" name="problemDescription" 
+                                  rows="4" required minlength="10" style="text-transform: uppercase;"><%= typeof formData !== 'undefined' ? formData.problemDescription : '' %></textarea>
+                        <div class="invalid-feedback">
+                            <i class="fas fa-info-circle me-1"></i>Please describe the problem (minimum 10 characters)
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rate Limit Error Modal -->
+<div class="modal fade" id="rateLimitModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Submission Limit Reached
+                </h5>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-clock fa-3x text-danger mb-3"></i>
+                    <h4>Too Many Submissions</h4>
+                    <p class="text-muted">You have reached the maximum number of repair submissions allowed. Please try again after 30 minutes.</p>
+                </div>
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    This limit helps us ensure quality service for all users.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="/track" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Track Existing Repairs
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+
+    // Phone number formatting
+    const phoneInput = document.querySelector('#phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+        });
+    }
+
+    // Real-time uppercase conversion for text inputs
+    const textInputs = ['customerName', 'designation', 'problemDescription'];
+    textInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            const cursorFix = (input) => {
+                const position = input.selectionStart;
+                window.requestAnimationFrame(() => {
+                    input.selectionStart = position;
+                    input.selectionEnd = position;
+                });
+            };
+
+            // Handle input events
+            input.addEventListener('input', function(e) {
+                const start = this.selectionStart;
+                this.value = this.value.toUpperCase();
+                this.setSelectionRange(start, start);
+            });
+
+            // Handle paste events
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const text = (e.clipboardData || window.clipboardData).getData('text');
+                const start = this.selectionStart;
+                this.value = text.toUpperCase();
+                this.setSelectionRange(start, start);
+            });
+
+            // Handle blur event to ensure uppercase
+            input.addEventListener('blur', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+    });
+    
+    // Show rate limit modal if error is rate limit
+    const error = '<%= typeof error !== "undefined" ? error : "" %>';
+    if (error.includes('Too many repair submissions')) {
+        const rateLimitModal = new bootstrap.Modal(document.getElementById('rateLimitModal'));
+        rateLimitModal.show();
+    }
+});
+</script>

@@ -1,0 +1,100 @@
+<div class="main-container">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                <i class="fas fa-clipboard-check fa-2x mb-2 text-primary"></i>
+                <h2>Repair Ticket Status</h2>
+            </div>
+            <div class="card-body">
+                <div class="status-grid mb-4">
+                    <div class="stat-card">
+                        <i class="fas fa-ticket-alt stat-icon"></i>
+                        <div>
+                            <h6 class="mb-1">Ticket ID</h6>
+                            <h4 class="mb-0"><%= ticket.ticketId %></h4>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-alt stat-icon"></i>
+                        <div>
+                            <h6 class="mb-1">Submitted On</h6>
+                            <h4 class="mb-0"><%= new Date(ticket.createdAt).toLocaleDateString() %></h4>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-tasks stat-icon"></i>
+                        <div>
+                            <h6 class="mb-1">Status</h6>
+                            <span class="badge <%= 
+                                ticket.status === 'pending' ? 'bg-warning' :
+                                ticket.status === 'in-progress' ? 'bg-info' :
+                                ticket.status === 'completed' ? 'bg-success' :
+                                'bg-danger'
+                            %>">
+                                <i class="fas <%= 
+                                    ticket.status === 'pending' ? 'fa-clock' :
+                                    ticket.status === 'in-progress' ? 'fa-tools' :
+                                    ticket.status === 'completed' ? 'fa-check-circle' :
+                                    'fa-times-circle'
+                                %> me-1"></i>
+                                <%= ticket.status.toUpperCase() %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card p-3 border rounded bg-light mb-3">
+                        <h5 class="mb-3">
+                            <i class="fas fa-user-circle me-2"></i>Customer Details
+                        </h5>
+                        <p class="mb-2">
+                            <i class="fas fa-user me-2"></i>
+                            <strong>Name:</strong> <%= ticket.customerName %>
+                        </p>
+                        <p class="mb-2">
+                            <i class="fas fa-id-badge me-2"></i>
+                            <strong>Designation:</strong> <%= ticket.designation %>
+                        </p>
+                        <p class="mb-0">
+                            <i class="fas fa-phone me-2"></i>
+                            <strong>Phone:</strong> <%= ticket.phone %>
+                        </p>
+                    </div>
+
+                    <div class="info-card p-3 border rounded bg-light mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-laptop me-2"></i>Device Information
+                        </h5>
+                        <p class="mb-2">
+                            <strong>Type:</strong> 
+                            <i class="fas <%= 
+                                ticket.deviceType === 'laptop' ? 'fa-laptop' :
+                                ticket.deviceType === 'desktop' ? 'fa-desktop' :
+                                ticket.deviceType === 'phone' ? 'fa-mobile-alt' :
+                                ticket.deviceType === 'tablet' ? 'fa-tablet-alt' :
+                                'fa-microchip'
+                            %> me-2"></i>
+                            <%= ticket.deviceType.charAt(0).toUpperCase() + ticket.deviceType.slice(1) %>
+                        </p>
+                        <h6 class="mt-3">
+                            <i class="fas fa-comment-dots me-2"></i>Problem Description:
+                        </h6>
+                        <p class="border p-3 bg-white rounded mb-0">
+                            <%= ticket.problemDescription %>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <a href="/track" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Track Another Ticket
+                    </a>
+                    <a href="/" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-plus me-2"></i>Submit New Repair
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

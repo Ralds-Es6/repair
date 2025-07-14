@@ -1,0 +1,27 @@
+{
+  "name": "repair-management-system",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^5.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.9",
+    "express": "^5.1.0",
+    "express-ejs-layouts": "^2.5.1",
+    "express-rate-limit": "^7.5.1",
+    "express-session": "^1.17.3",
+    "mongoose": "^8.15.2",
+    "node-fetch": "^3.3.2",
+    "pdf-lib": "^1.17.1"
+  },
+  "devDependencies": {
+    "@types/package-json": "^5.0.0",
+    "nodemon": "^3.0.1"
+  }
+}

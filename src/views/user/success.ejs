@@ -1,0 +1,62 @@
+
+<div class="main-container">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header text-center">
+                <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+                <h2 class="text-success">Request Submitted Successfully!</h2>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success mb-4">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-clipboard-check fa-2x me-3"></i>
+                        <div>
+                            <h4 class="alert-heading mb-2">Thank you for your repair request!</h4>
+                            <p class="mb-0">Your repair ticket has been created successfully. Please save your ticket ID for future reference.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ticket-id-card text-center p-4 mb-4 border rounded bg-light">
+                    <h5 class="text-muted mb-3">Your Ticket ID</h5>
+                    <div class="ticket-number">
+                        <h2 class="display-6 mb-0">
+                            <i class="fas fa-ticket-alt me-2 text-primary"></i>
+                            <span class="badge bg-primary px-4 py-3"><%= ticketId %></span>
+                        </h2>
+                    </div>
+                </div>
+
+                <div class="info-card p-4 border rounded bg-light mb-4">
+                    <h5 class="mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        What's Next?
+                    </h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">
+                            <i class="fas fa-bookmark me-2 text-primary"></i>
+                            Save your ticket ID for reference
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-search me-2 text-primary"></i>
+                            You can track your repair status using this ID
+                        </li>
+                        <li class="mb-0">
+                            <i class="fas fa-clock me-2 text-primary"></i>
+                            We will review your request and update the status
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="text-center">
+                    <a href="/track" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Track Your Repair
+                    </a>
+                    <a href="/" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-plus me-2"></i>Submit Another Request
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
