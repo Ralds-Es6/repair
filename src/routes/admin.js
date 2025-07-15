@@ -263,12 +263,16 @@ router.post('/ticket/:id/delete', isAuthenticated, async (req, res) => {
         await RepairTicket.findByIdAndDelete(id);
         
         // Redirect back to the dashboard with the current filters
-        const redirectUrl = new URL('/admin/dashboard', 'https://repair-j8li.onrender.com/');
-        if (req.query.page) redirectUrl.searchParams.set('page', req.query.page);
-        if (req.query.status) redirectUrl.searchParams.set('status', req.query.status);
-        if (req.query.search) redirectUrl.searchParams.set('search', req.query.search);
-        
-        return res.redirect(redirectUrl.pathname + redirectUrl.search);
+        let redirectUrl = '/admin/dashboard';
+        const params = new URLSearchParams();
+        if (req.query.page) params.set('page', req.query.page);
+        if (req.query.status) params.set('status', req.query.status);
+        if (req.query.search) params.set('search', req.query.search);
+
+        if (params.toString()) {
+            redirectUrl += `?${params.toString()}`;
+        }
+        return res.redirect(redirectUrl);
     } catch (error) {
         console.error('Error deleting ticket:', error);
         return res.status(500).json({ error: 'Failed to delete ticket' });
