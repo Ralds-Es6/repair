@@ -24,6 +24,11 @@ router.get('/', (req, res) => {
     res.render('user/submit-repair');
 });
 
+//rendering and printing through pdf
+router.get('/submit-reapair', (req, res) => {
+    res.render('user/submit-repair');
+});
+
 // Submit repair ticket - with rate limiter
 router.post('/submit-repair', repairSubmissionLimiter, async (req, res) => {
     console.log('=== Starting ticket submission ===');
