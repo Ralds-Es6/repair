@@ -1,0 +1,197 @@
+/* PDF-specific styles */
+:root {
+    --pdf-primary: #2c3e50;
+    --pdf-secondary: #3498db;
+    --pdf-success: #2ecc71;
+    --pdf-warning: #f1c40f;
+    --pdf-danger: #e74c3c;
+    --pdf-border: #dce4ec;
+}
+
+.pdf-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1.5rem;
+    padding: 2rem;
+    font-family: 'Helvetica', sans-serif;
+}
+
+.pdf-header {
+    grid-column: span 12;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 2px solid var(--pdf-primary);
+    margin-bottom: 2rem;
+}
+
+.pdf-title {
+    font-size: 24px;
+    color: var(--pdf-primary);
+    font-weight: bold;
+}
+
+.pdf-date {
+    color: var(--pdf-secondary);
+    font-size: 14px;
+}
+
+.pdf-table {
+    grid-column: span 12;
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.pdf-table th,
+.pdf-table td {
+    border: 1px solid var(--pdf-border);
+    padding: 12px;
+    text-align: left;
+}
+
+.pdf-table th {
+    background-color: #f8f9fa;
+    color: var(--pdf-primary);
+    font-weight: bold;
+}
+
+.pdf-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.pdf-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.pdf-status.pending {
+    background-color: var(--pdf-warning);
+    color: #fff;
+}
+
+.pdf-status.in-progress {
+    background-color: var(--pdf-secondary);
+    color: #fff;
+}
+
+.pdf-status.completed {
+    background-color: var(--pdf-success);
+    color: #fff;
+}
+
+.pdf-status.cancelled {
+    background-color: var(--pdf-danger);
+    color: #fff;
+}
+
+.pdf-meta {
+    grid-column: span 12;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.pdf-meta-item {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--pdf-secondary);
+}
+
+.pdf-meta-label {
+    color: var(--pdf-primary);
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.pdf-meta-value {
+    color: var(--pdf-secondary);
+    font-size: 16px;
+    margin-top: 4px;
+}
+
+.pdf-signatures {
+    grid-column: span 12;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--pdf-border);
+}
+
+.pdf-signature-box {
+    flex: 0 0 45%;
+    text-align: center;
+}
+
+.pdf-signature-line {
+    width: 100%;
+    border-bottom: 1px solid var(--pdf-primary);
+    margin-bottom: 0.5rem;
+}
+
+.pdf-signature-label {
+    font-size: 12px;
+    color: var(--pdf-primary);
+}
+
+/* Signature Display Enhancements */
+.signature-display {
+    border: 2px dashed var(--pdf-border);
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    margin: 1rem 0;
+}
+
+.signature-image {
+    max-width: 200px;
+    max-height: 100px;
+    display: block;
+    margin: 0 auto;
+    border: 1px solid var(--pdf-border);
+    border-radius: 4px;
+}
+
+.signature-status {
+    text-align: center;
+    margin-top: 0.5rem;
+    font-size: 12px;
+    color: var(--pdf-secondary);
+}
+
+/* Button Group Enhancements */
+.btn-group .btn {
+    border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+/* PDF Loading Indicator */
+.pdf-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.pdf-loading .spinner-border {
+    color: var(--pdf-secondary);
+}
